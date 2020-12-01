@@ -13,6 +13,8 @@ def register_tortoise(
     config_file: Optional[str] = None,
     db_url: Optional[str] = None,
     modules: Optional[Dict[str, List[str]]] = None,
+    use_tz: bool = False,
+    timezone: str = "UTC",
     generate_schemas: bool = False,
 ) -> None:
     """
@@ -81,7 +83,14 @@ def register_tortoise(
 
     @app.before_serving
     async def init_orm() -> None:  # pylint: disable=W0612
-        await Tortoise.init(config=config, config_file=config_file, db_url=db_url, modules=modules)
+        await Tortoise.init(
+            config=config,
+            config_file=config_file,
+            db_url=db_url,
+            modules=modules,
+            use_tz=use_tz,
+            timezone=timezone,
+        )
         logging.info("Tortoise-ORM started, %s, %s", Tortoise._connections, Tortoise.apps)
         if _generate_schemas:
             logging.info("Tortoise-ORM generating schema")
@@ -98,7 +107,12 @@ def register_tortoise(
 
         async def inner() -> None:
             await Tortoise.init(
-                config=config, config_file=config_file, db_url=db_url, modules=modules
+                config=config,
+                config_file=config_file,
+                db_url=db_url,
+                modules=modules,
+                use_tz=use_tz,
+                timezone=timezone,
             )
             await Tortoise.generate_schemas()
             await Tortoise.close_connections()
